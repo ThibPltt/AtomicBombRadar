@@ -5,3 +5,7 @@
 
 ##### Je commence d'abord par créer la page html, css, js
 ##### J'initialise node
+
+
+## Thibaut Platet
+## 4A IPS

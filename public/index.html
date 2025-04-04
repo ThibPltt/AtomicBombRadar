@@ -3,18 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AtomicBombRadar</title>
+    <title>Carte Interactive</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <h1>AtomicBombRadar</h1>
-    <div id="map"></div>
+    <h1>Carte Interactive</h1>
+    <div id="main-container">
+        <div id="map"></div>
+        <div id="countries-container">
+            <div id="search-container">
+                <input type="text" id="search-bar" placeholder="Rechercher une ville...">
+                <button id="search-button">Rechercher</button>
+                <div class="tab">
+                    <button class="tablinks" onclick="openTab(event, 'USA')">États-Unis</button>
+                    <button class="tablinks" onclick="openTab(event, 'Russia')">Russie</button>
+                    <button class="tablinks" onclick="openTab(event, 'USSR')">Union Soviétique</button>
+                    <button class="tablinks" onclick="openTab(event, 'France')">France</button>
+                    <button class="tablinks" onclick="openTab(event, 'UK')">Royaume-Uni</button>
+                    <button class="tablinks" onclick="openTab(event, 'China')">Chine</button>
+                </div>
+                <div id="USA" class="tabcontent">
+                    <div class="bomb-case" onclick="setBombRadius(1600, 'Little Boy')">
+                        <img src="images/littleboy.jpg" alt="Little Boy">
+                        <span>Little Boy</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(1800, 'Fat Man')">
+                        <img src="images/fatman.jpg" alt="Fat Man">
+                        <span>Fat Man</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(30000, 'Ivy Mike')">
+                        <img src="images/ivymike.jpg" alt="Ivy Mike">
+                        <span>Ivy Mike</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(25000, 'Castle Bravo')">
+                        <img src="images/castlebravo.jpg" alt="Castle Bravo">
+                        <span>Castle Bravo</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(5000, 'B41')">
+                        <img src="images/b41.jpg" alt="B41">
+                        <span>B41</span>
+                    </div>
+                </div>
+
+                <div id="Russia" class="tabcontent">
+                    <div class="bomb-case" onclick="setBombRadius(50000, 'Tsar Bomba')">
+                        <img src="images/tsarbomba.jpg" alt="Tsar Bomba">
+                        <span>Tsar Bomba</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(20000, 'RDS-37')">
+                        <img src="images/rds37.jpg" alt="RDS-37">
+                        <span>RDS-37</span>
+                    </div>
+                </div>
+                
+                <div id="France" class="tabcontent">
+                    <div class="bomb-case" onclick="setBombRadius(10000, 'Gerboise Bleue')">
+                        <img src="images/gerboisebleue.jpg" alt="Gerboise Bleue">
+                        <span>Gerboise Bleue</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(15000, 'Canopus')">
+                        <img src="images/canopus.jpg" alt="Canopus">
+                        <span>Canopus</span>
+                    </div>
+                </div>
+                
+                <div id="UK" class="tabcontent">
+                    <div class="bomb-case" onclick="setBombRadius(8000, 'Blue Danube')">
+                        <img src="images/bluedanube.jpg" alt="Blue Danube">
+                        <span>Blue Danube</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(12000, 'Yellow Sun')">
+                        <img src="images/yellowsun.jpg" alt="Yellow Sun">
+                        <span>Yellow Sun</span>
+                    </div>
+                </div>
+                
+                <div id="China" class="tabcontent">
+                    <div class="bomb-case" onclick="setBombRadius(20000, '596')">
+                        <img src="images/596.jpg" alt="596">
+                        <span>596</span>
+                    </div>
+                    <div class="bomb-case" onclick="setBombRadius(25000, 'Test No. 6')">
+                        <img src="images/test6.jpg" alt="Test No. 6">
+                        <span>Test No. 6</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
         // Coordonnées de la carte centrée sur Paris
         var map = L.map('map').setView([48.8566, 2.3522], 13);
+        var marker = null;
+        var explosionCircle = null;
+        var radiationCircle = null;
 
         // Ajout des tuiles de la carte
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -22,8 +107,83 @@
         }).addTo(map);
 
         // Ajout d'un marqueur à Paris
-        var marker = L.marker([48.8566, 2.3522]).addTo(map);
+        marker = L.marker([48.8566, 2.3522]).addTo(map);
         marker.bindPopup("<b>Paris</b><br>Capitale de la France.").openPopup();
+
+        // Fonction pour rechercher une ville
+        document.getElementById('search-button').addEventListener('click', function() {
+            var city = document.getElementById('search-bar').value;
+            if (city) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            var location = data[0];
+                            map.setView([location.lat, location.lon], 13);
+                            if (marker) {
+                                map.removeLayer(marker);
+                            }
+                            marker = L.marker([location.lat, location.lon]).addTo(map);
+                            marker.bindPopup(`<b>${location.display_name}</b>`).openPopup();
+                        } else {
+                            alert('Ville non trouvée.');
+                        }
+                    })
+                    .catch(error => console.error('Erreur lors de la recherche:', error));
+            }
+        });
+
+        // Fonction pour définir le rayon d'explosion et de radiation
+        function setBombRadius(radius, bombName) {
+            if (marker) {
+                var latLng = marker.getLatLng();
+
+                // Supprimer les cercles existants
+                if (explosionCircle) {
+                    map.removeLayer(explosionCircle);
+                }
+                if (radiationCircle) {
+                    map.removeLayer(radiationCircle);
+                }
+
+                // Ajouter un cercle pour le rayon d'explosion
+                explosionCircle = L.circle(latLng, {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: radius
+                }).addTo(map);
+
+                // Ajouter un cercle pour le rayon de radiation (2x le rayon d'explosion)
+                radiationCircle = L.circle(latLng, {
+                    color: 'yellow',
+                    fillColor: '#ff0',
+                    fillOpacity: 0.3,
+                    radius: radius * 2
+                }).addTo(map);
+
+                // Mettre à jour le popup du marqueur
+                marker.bindPopup(`<b>${bombName}</b><br>Rayon d'explosion: ${radius} m`).openPopup();
+            }
+        }
+
+        // Fonction pour ouvrir les onglets
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Ouvrir le premier onglet par défaut
+        document.getElementsByClassName("tablinks")[0].click();
     </script>
 </body>
 </html>
