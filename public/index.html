@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtomicBombRadar</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <h1>AtomicBombRadar</h1>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Coordonnées de la carte centrée sur Paris
+        var map = L.map('map').setView([48.8566, 2.3522], 13);
+
+        // Ajout des tuiles de la carte
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Ajout d'un marqueur à Paris
+        var marker = L.marker([48.8566, 2.3522]).addTo(map);
+        marker.bindPopup("<b>Paris</b><br>Capitale de la France.").openPopup();
+    </script>
+</body>
+</html>
