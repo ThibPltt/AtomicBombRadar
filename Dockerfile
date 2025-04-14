@@ -1,22 +1,32 @@
+# Build Node.js application
+FROM node:16
 
-# Utilisez une image Node.js comme base
-FROM node:18-alpine
-
-# Définissez le répertoire de travail dans le conteneur
 WORKDIR /app
 
-# Copiez les fichiers package.json et package-lock.json (si vous l'avez)
-COPY package*.json ./
-
-# Installez les dépendances Node.js
+# Copy package.json and install dependencies
+COPY package.json ./
 RUN npm install
 
-# Copiez le reste du code de l'application
-COPY server.js .
+# Copy application code
+COPY . .
 
-# Exposez le port sur lequel l'application Node.js écoute
+# Expose the Node.js server port
 EXPOSE 3000
 
-# Commande à exécuter lorsque le conteneur démarre
-CMD ["node", "app.js"]
+# Start the Node.js server
+CMD ["node", "server.js"]
 
+# Configure Nginx as reverse proxy
+FROM nginx:latest
+
+# Copy static files into the container's web root
+COPY ./public /usr/share/nginx/html
+
+# Copy custom Nginx configuration file
+COPY ./nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80 for external access
+EXPOSE 80
+
+# Start Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
