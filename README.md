@@ -6,4 +6,7 @@
 ##### Je commence d'abord par créer la page html, css, js
 ##### J'initialise node
 
-##### J'ajoute nginx pour.................
+##### Je créé un Dockerfile incluant le projet Node afin de le porter sur le web.
+
+##### J'ajoute nginx, un serveur web, permettant de répondre efficacement aux requêtes HTTPS avec un grand nombre de connexions simultanées.
+##### Je modifie mon Dockerfile pour y intégrer à la fois Node et nginx, pour déployer le site web. Malheureusement, lors du portage le fond de carte OpenStreetMap ne s'est pas déployé, ce qui est surement dû à la taille ou à la propriété de l'API.
