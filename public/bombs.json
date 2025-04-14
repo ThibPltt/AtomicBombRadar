@@ -1,0 +1,25 @@
+{
+    "USA": [
+        { "name": "Little Boy", "radius": 1600, "image": "images/littleboy.jpg" },
+        { "name": "Fat Man", "radius": 1800, "image": "images/fatman.jpg" },
+        { "name": "Ivy Mike", "radius": 30000, "image": "images/ivymike.jpg" },
+        { "name": "Castle Bravo", "radius": 25000, "image": "images/castlebravo.jpg" },
+        { "name": "B41", "radius": 5000, "image": "images/b41.jpg" }
+    ],
+    "Russia": [
+        { "name": "Tsar Bomba", "radius": 50000, "image": "images/tsarbomba.jpg" },
+        { "name": "RDS-37", "radius": 20000, "image": "images/rds37.jpg" }
+    ],
+    "France": [
+        { "name": "Gerboise Bleue", "radius": 10000, "image": "images/gerboisebleue.jpg" },
+        { "name": "Canopus", "radius": 15000, "image": "images/canopus.jpg" }
+    ],
+    "UK": [
+        { "name": "Blue Danube", "radius": 8000, "image": "images/bluedanube.jpg" },
+        { "name": "Yellow Sun", "radius": 12000, "image": "images/yellowsun.jpg" }
+    ],
+    "China": [
+        { "name": "596", "radius": 20000, "image": "images/596.jpg" },
+        { "name": "Test No. 6", "radius": 25000, "image": "images/test6.jpg" }
+    ]
+}

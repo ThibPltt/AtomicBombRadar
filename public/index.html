@@ -3,91 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carte Interactive</title>
+    <title>AtomicBombRadar</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <h1>Carte Interactive</h1>
+    <h1>AtomicBombRadar</h1>
     <div id="main-container">
         <div id="map"></div>
         <div id="countries-container">
             <div id="search-container">
                 <input type="text" id="search-bar" placeholder="Rechercher une ville...">
                 <button id="search-button">Rechercher</button>
-                <div class="tab">
-                    <button class="tablinks" onclick="openTab(event, 'USA')">États-Unis</button>
-                    <button class="tablinks" onclick="openTab(event, 'Russia')">Russie</button>
-                    <button class="tablinks" onclick="openTab(event, 'USSR')">Union Soviétique</button>
-                    <button class="tablinks" onclick="openTab(event, 'France')">France</button>
-                    <button class="tablinks" onclick="openTab(event, 'UK')">Royaume-Uni</button>
-                    <button class="tablinks" onclick="openTab(event, 'China')">Chine</button>
+                <div class="tab" id="tabs-container">
+                    <!-- Les boutons des onglets seront générés dynamiquement -->
                 </div>
-                <div id="USA" class="tabcontent">
-                    <div class="bomb-case" onclick="setBombRadius(1600, 'Little Boy')">
-                        <img src="images/littleboy.jpg" alt="Little Boy">
-                        <span>Little Boy</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(1800, 'Fat Man')">
-                        <img src="images/fatman.jpg" alt="Fat Man">
-                        <span>Fat Man</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(30000, 'Ivy Mike')">
-                        <img src="images/ivymike.jpg" alt="Ivy Mike">
-                        <span>Ivy Mike</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(25000, 'Castle Bravo')">
-                        <img src="images/castlebravo.jpg" alt="Castle Bravo">
-                        <span>Castle Bravo</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(5000, 'B41')">
-                        <img src="images/b41.jpg" alt="B41">
-                        <span>B41</span>
-                    </div>
-                </div>
-
-                <div id="Russia" class="tabcontent">
-                    <div class="bomb-case" onclick="setBombRadius(50000, 'Tsar Bomba')">
-                        <img src="images/tsarbomba.jpg" alt="Tsar Bomba">
-                        <span>Tsar Bomba</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(20000, 'RDS-37')">
-                        <img src="images/rds37.jpg" alt="RDS-37">
-                        <span>RDS-37</span>
-                    </div>
-                </div>
-                
-                <div id="France" class="tabcontent">
-                    <div class="bomb-case" onclick="setBombRadius(10000, 'Gerboise Bleue')">
-                        <img src="images/gerboisebleue.jpg" alt="Gerboise Bleue">
-                        <span>Gerboise Bleue</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(15000, 'Canopus')">
-                        <img src="images/canopus.jpg" alt="Canopus">
-                        <span>Canopus</span>
-                    </div>
-                </div>
-                
-                <div id="UK" class="tabcontent">
-                    <div class="bomb-case" onclick="setBombRadius(8000, 'Blue Danube')">
-                        <img src="images/bluedanube.jpg" alt="Blue Danube">
-                        <span>Blue Danube</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(12000, 'Yellow Sun')">
-                        <img src="images/yellowsun.jpg" alt="Yellow Sun">
-                        <span>Yellow Sun</span>
-                    </div>
-                </div>
-                
-                <div id="China" class="tabcontent">
-                    <div class="bomb-case" onclick="setBombRadius(20000, '596')">
-                        <img src="images/596.jpg" alt="596">
-                        <span>596</span>
-                    </div>
-                    <div class="bomb-case" onclick="setBombRadius(25000, 'Test No. 6')">
-                        <img src="images/test6.jpg" alt="Test No. 6">
-                        <span>Test No. 6</span>
-                    </div>
+                <div id="tab-contents-container">
+                    <!-- Les contenus des onglets seront générés dynamiquement -->
                 </div>
             </div>
         </div>
@@ -102,7 +34,7 @@
         var radiationCircle = null;
 
         // Ajout des tuiles de la carte
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('/osm/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
@@ -167,6 +99,52 @@
             }
         }
 
+        // Charger les données des bombes depuis le fichier JSON
+        fetch('bombs.json')
+            .then(response => response.json())
+            .then(data => {
+                const tabsContainer = document.getElementById('tabs-container');
+                const tabContentsContainer = document.getElementById('tab-contents-container');
+
+                // Parcourir les pays et leurs bombes
+                for (const country in data) {
+                    // Créer un bouton pour chaque pays
+                    const tabButton = document.createElement('button');
+                    tabButton.className = 'tablinks';
+                    tabButton.textContent = country;
+                    tabButton.onclick = (event) => openTab(event, country);
+                    tabsContainer.appendChild(tabButton);
+
+                    // Créer un contenu d'onglet pour chaque pays
+                    const tabContent = document.createElement('div');
+                    tabContent.id = country;
+                    tabContent.className = 'tabcontent';
+
+                    data[country].forEach(bomb => {
+                        const bombCase = document.createElement('div');
+                        bombCase.className = 'bomb-case';
+                        bombCase.onclick = () => setBombRadius(bomb.radius, bomb.name);
+
+                        const img = document.createElement('img');
+                        img.src = bomb.image;
+                        img.alt = bomb.name;
+
+                        const span = document.createElement('span');
+                        span.textContent = bomb.name;
+
+                        bombCase.appendChild(img);
+                        bombCase.appendChild(span);
+                        tabContent.appendChild(bombCase);
+                    });
+
+                    tabContentsContainer.appendChild(tabContent);
+                }
+
+                // Ouvrir le premier onglet par défaut
+                document.getElementsByClassName('tablinks')[0].click();
+            })
+            .catch(error => console.error('Erreur lors du chargement des bombes:', error));
+
         // Fonction pour ouvrir les onglets
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
@@ -181,9 +159,6 @@
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
-
-        // Ouvrir le premier onglet par défaut
-        document.getElementsByClassName("tablinks")[0].click();
     </script>
 </body>
 </html>
